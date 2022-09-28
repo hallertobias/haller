@@ -1,8 +1,13 @@
 #include <iostream>
 #include <chrono>
+#include <thread>
 
 using namespace std;
 
-void charout(int argc, char *argv[]) {
-    
+int main(int argc, char *argv[]) {
+    while(true){
+        cout << argv[argc - 1] << endl;
+        chrono::milliseconds sleeptime(500);
+        this_thread::sleep_for(sleeptime);
+    }
 }
