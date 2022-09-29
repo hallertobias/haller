@@ -5,13 +5,15 @@ project('aba', 'cpp',
 
 inc_dir = include_directories(['include'])
 
-src = ['src/aba.cpp', 'src/charout.cpp']
+src = ['src/aba.cpp']
 
 executable('aba',
             sources : src,
             include_directories : inc_dir,
           )
 
+src2 = ['src/charout.cpp']
+
 executable('charout',
-           sources: src,
+           sources: src2,
            include_directories: inc_dir)
