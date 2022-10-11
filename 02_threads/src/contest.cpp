@@ -1,19 +1,13 @@
 #include <iostream>
 #include <thread>
+#include "car.cpp"
 
 using namespace std;
 
-void c63_amg() {
-    int i{};
-    while(true) {
-        cout << i << ". Runde C63 AMG" << endl;
-        i++;
-        this_thread::sleep_for(1s);
-    }
-}
-
 int main() {
-    c63_amg();
+    Car c{"BWM X5 M"};
+    thread t{c};
+    t.join();
     return 0;
 }
 
