@@ -6,7 +6,7 @@
 using namespace std;
 
 Car::Car(string name) {
-    carName = name;
+    this->carName = name;
 }
 
 void Car::printOut() {
@@ -23,9 +23,18 @@ void Car::printOut() {
         cout << output << flush;
         i++;
         this_thread::sleep_for(chrono::milliseconds{time}*1000);
+        this->timeSum += rounded;
     }
 }
 
 void Car::operator()() {
     printOut();
+}
+
+double Car::getTimeSum() {
+    return this->timeSum;
+}
+
+string Car::getCarName() {
+    return this->carName;
 }

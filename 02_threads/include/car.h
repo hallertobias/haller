@@ -6,11 +6,15 @@
 using namespace std;
 
 class Car {
+    private:
+        double timeSum;
+        string carName;
     public:    
         Car(string carName);
-        string carName;
         void printOut();
         void operator()();
+        string getCarName();
+        double getTimeSum();
 };
 
 #endif
