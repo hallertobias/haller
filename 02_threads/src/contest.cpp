@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
     if (argc > 1) {
         if (string(argv[1]) == "-h" || string(argv[1]) == "--help") {
             help();
-            return 1;
+            return 0;
         } else {
             string s{argv[1]};
             try {
