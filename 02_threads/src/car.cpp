@@ -5,8 +5,9 @@
 
 using namespace std;
 
-Car::Car(string name) {
+Car::Car(string name, int laps) {
     this->carName = name;
+    this->laps = laps;
 }
 
 void Car::printOut() {
@@ -15,7 +16,7 @@ void Car::printOut() {
     random_device rd;
     mt19937 gen{rd()};
     uniform_real_distribution<> dis{1, 10};
-    while(i <= 10) {
+    while(i <= this->laps) {
         int time = dis(gen);
         double rounded = ceil(dis(gen)*100.00)/100.00;
         output = to_string(i) + ". Runde " + this->carName

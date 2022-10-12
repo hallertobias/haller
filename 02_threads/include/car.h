@@ -9,8 +9,9 @@ class Car {
     private:
         double timeSum;
         string carName;
+        int laps;
     public:    
-        Car(string carName);
+        Car(string carName, int laps);
         void printOut();
         void operator()();
         string getCarName();
