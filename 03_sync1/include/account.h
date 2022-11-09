@@ -10,4 +10,20 @@ class Account {
         bool withdraw(int amount);
 };
 
+class Depositer {
+    private:
+        Account& account;
+        int count;
+    public:
+        Depositer(Account& acc, int depositCount):
+            account(acc), 
+            count(depositCount)
+            {};
+        void operator()(){
+            for(int i = 0; i < count; i++){
+                account.desposit(1);
+            }
+        }
+};
+
 #endif
