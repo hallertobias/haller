@@ -6,6 +6,10 @@ using namespace std;
 
 mutex m;
 
+Account::Account(int balance) {
+    this->balance = balance;
+}
+
 int Account::get_balance() {
     return this->balance;
 }

@@ -5,6 +5,7 @@ class Account {
     private:
         int balance{0};
     public:    
+        Account(int balane); 
         int get_balance(); 
         void desposit(int amount); 
         bool withdraw(int amount);
