@@ -8,17 +8,19 @@
 
 using namespace std;
 
-WorkQueue::WorkQueue() {};
-
 void WorkQueue::push(WorkPacket wp) {
-  unique_lock<mutex> lck{mtx};
-  q.push(wp);
+    unique_lock<mutex> lck{mtx};
+    not_full.wait(lck, [this]{return q.size() < size;});
+    q.push(wp);
+    not_empty.notify_one();
 }
 
 WorkPacket WorkQueue::pop() {
-  unique_lock<mutex> lck{mtx};
-  WorkPacket wp = q.front();
-  q.pop();
-  return wp;
+    unique_lock<mutex> lck{mtx};
+    not_empty.wait(lck, [this]{return q.size();});
+    WorkPacket wp = q.front();
+    q.pop();
+    not_full.notify_one();
+    return wp;
 }
 
