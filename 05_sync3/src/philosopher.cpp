@@ -5,8 +5,19 @@
 
 #include <iostream>
 #include "philosopher.h"
+#include <mutex>
 
 using namespace std;
+
+mutex mtx;
+
+void println(const std::vector<string>& v){
+    lock_guard<mutex> lck(mtx);
+    for(string s : v){
+        cout << s << " ";
+    }
+    cout << endl;
+}
 
 void Philosopher::operator()() {
     while(true){
