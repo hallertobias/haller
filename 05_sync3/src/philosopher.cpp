@@ -32,6 +32,7 @@ void Philosopher::operator()() {
         leftFork.lock();
 
         println("Philosopher ", id, " got left fork. Now he wants the right one... ");
+        this_thread::sleep_for(5s);
         println("Philosopher ", id, " attempts to get right fork");
         rightFork.lock();
 

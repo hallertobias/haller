@@ -1,5 +1,6 @@
 /*
-    author: Haller Tobias, 5AHIF
+    author: Haller Tobias
+    class: 5AHIF
 */
 
 #pragma once
