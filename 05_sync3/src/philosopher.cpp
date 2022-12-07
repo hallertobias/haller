@@ -9,39 +9,39 @@
 
 using namespace std;
 
-mutex mtx;
+recursive_mutex out_mtx;
 
-void println(const initializer_list<string>& v){
-    lock_guard<mutex> lck(mtx);
-    for(string s : v){
-        cout << s << " ";
-    }
+void println() {
+    lock_guard<recursive_mutex> lg{out_mtx};
     cout << endl;
+}
+
+template<typename T, typename... Rest>
+void println(const T& word, const Rest&... rest) {
+    lock_guard<recursive_mutex> lg{out_mtx};
+    cout << word << ' ';
+    println(rest...);
 }
 
 void Philosopher::operator()() {
     while(true){
-        cout << "Philosopher " << id << " is thinking..." << endl;
+        println("Philosopher ", id, " is thinking...");
         this_thread::sleep_for(1s);
 
-        cout << "Philosopher " << id << " attempts to get left fork" << endl;
-
+        println("Philosopher ", id, " attempts to get left fork");
         leftFork.lock();
 
-        cout << "Philosopher " << id << " got left fork. Now he wants the right one... " << endl;
-
-        cout << "Philosopher " << id << " attempts to get right fork" << endl;
-
+        println("Philosopher ", id, " got left fork. Now he wants the right one... ");
+        println("Philosopher ", id, " attempts to get right fork");
         rightFork.lock();
 
-        cout << "Philosopher " << id << " got right fork. Now he is eating..." << endl;
-
+        println("Philosopher ", id, " got right fork. Now he is eating...");
         this_thread::sleep_for(2s);
 
-        cout << "Philosopher " << id << " finished eating" << endl;
-        cout << "Philosopher " << id << " released left fork" << endl;
+        println("Philosopher ", id, " finished eating");
+        println("Philosopher ", id, " released left fork");
         leftFork.unlock();
-        cout << "Philosopher " << id << " released right fork" << endl;
+        println("Philosopher ", id, " released right fork");;
         rightFork.unlock();
     }
 };
