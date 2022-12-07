@@ -14,13 +14,13 @@ using namespace std;
 class Philosopher {
     private: 
         int id; 
-        mutex& leftFork; 
-        mutex& rightFork;
+        timed_mutex& leftFork; 
+        timed_mutex& rightFork;
     public:
-        Philosopher(int id, std::mutex& leftFork, std::mutex& rightFork) : 
+        Philosopher(int id, timed_mutex& leftFork, timed_mutex& rightFork) : 
           id(id),
           leftFork(leftFork),
           rightFork(rightFork)
           {};
-        void operator()(SemaphoreOwn* s);
+        void operator()(SemaphoreOwn* s, bool livelock);
 };
