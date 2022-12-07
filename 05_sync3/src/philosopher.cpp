@@ -11,7 +11,7 @@ using namespace std;
 
 mutex mtx;
 
-void println(const std::vector<string>& v){
+void println(const initializer_list<string>& v){
     lock_guard<mutex> lck(mtx);
     for(string s : v){
         cout << s << " ";
@@ -21,7 +21,6 @@ void println(const std::vector<string>& v){
 
 void Philosopher::operator()() {
     while(true){
-
         cout << "Philosopher " << id << " is thinking..." << endl;
         this_thread::sleep_for(1s);
 
