@@ -6,6 +6,7 @@
 #include <iostream>
 #include "philosopher.h"
 #include <mutex>
+#include "semaphoreOwn.h"
 
 using namespace std;
 
@@ -23,10 +24,14 @@ void println(const T& word, const Rest&... rest) {
     println(rest...);
 }
 
-void Philosopher::operator()() {
+void Philosopher::operator()(SemaphoreOwn* s) {
     while(true){
         println("Philosopher ", id, " is thinking...");
         this_thread::sleep_for(1s);
+
+        if (s != nullptr) {
+            s->acquire();
+        }
 
         println("Philosopher ", id, " attempts to get left fork");
         leftFork.lock();
@@ -40,9 +45,13 @@ void Philosopher::operator()() {
         this_thread::sleep_for(2s);
 
         println("Philosopher ", id, " finished eating");
-        println("Philosopher ", id, " released left fork");
+        if (s != nullptr){
+            s->release();
+        }
         leftFork.unlock();
-        println("Philosopher ", id, " released right fork");;
+        println("Philosopher", id, " released left fork");
+
         rightFork.unlock();
+        println("Philosopher ", id, " released right fork");;
     }
 };

@@ -3,26 +3,25 @@
     class: 5AHIF
 */
 
-#include "semaphore.h"
 
 #include <mutex>
+#include "semaphoreOwn.h"
 
 using namespace std;
 
-void Semaphore::release(){
+void SemaphoreOwn::release(){
     cnr += 1;
     wcv.notify_one();
 }
 
-void Semaphore::acquire(){
+void SemaphoreOwn::acquire(){
     unique_lock<mutex> ul{mtx};
     wcv.wait(ul, [&]() {
         return (cnr - 1) >= 0;
     });
-
     cnr -= 1;
 }
 
-int Semaphore::available_permits(){
-    return cnr;
+int SemaphoreOwn::available_permits(){
+   return cnr;
 }

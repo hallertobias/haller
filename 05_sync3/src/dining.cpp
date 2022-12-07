@@ -1,7 +1,7 @@
 #include <mutex>
 #include <thread>
 #include "philosopher.cpp"
-#include "semaphore.h"
+#include "semaphoreOwn.cpp"
 
 using namespace std;
 
@@ -9,7 +9,7 @@ int main() {
     mutex mutexRight;
     mutex mutexLeft;
 
-    Semaphore* s = new Semaphore(5);
+    SemaphoreOwn* s = new SemaphoreOwn{5};
 
     Philosopher p1(1, mutexRight, mutexLeft);
     Philosopher p2(2, mutexRight, mutexLeft);

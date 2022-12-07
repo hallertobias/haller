@@ -3,9 +3,11 @@
     class: 5AHIF
 */
 
+#pragma once
+
 #include <thread>
 #include <mutex>
-#include "semaphore.h"
+#include "semaphoreOwn.h"
 
 using namespace std;
 
@@ -20,5 +22,5 @@ class Philosopher {
           leftFork(leftFork),
           rightFork(rightFork)
           {};
-        void operator()(Semaphore* s);
+        void operator()(SemaphoreOwn* s);
 };
