@@ -5,6 +5,7 @@
 
 #include <thread>
 #include <mutex>
+#include "semaphore.h"
 
 using namespace std;
 
@@ -19,5 +20,5 @@ class Philosopher {
           leftFork(leftFork),
           rightFork(rightFork)
           {};
-        void operator()();
+        void operator()(Semaphore* s);
 };
