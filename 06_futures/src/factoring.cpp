@@ -10,6 +10,7 @@
 #include "InfInt.h"
 #include "CLI11.hpp"
 #include "calc_factors.h"
+#include <future>
 
 
 using namespace std;
@@ -25,6 +26,7 @@ string checkValidator(const string& s){
 
 int main(int argc, char* const argv[]) {
     vector<string> input;
+    vector<future<vector<InfInt>> > factorFutures{};
 
     CLI::App app("Factor numbers");
     app.add_option("number", input, "numbers to factor")->required()->check(checkValidator);
@@ -41,11 +43,23 @@ int main(int argc, char* const argv[]) {
             newInput.push_back(input_item);
         }
 
-        for(int i = 0; i < newInput.size(); i++){
-            vector<InfInt> factors = get_factors(newInput[i]);
-            cout << newInput[i] << ": " << endl;
-            for(int j = 0; j < factors.size(); j++){
-                cout << factors[j] << " " << endl;
+        for (const InfInt& number : newInput) {
+            factorFutures.push_back(async(launch::async, get_factors, number));
+        }
+
+        int index = 0;
+        while (!factorFutures.empty()) {
+            auto factorFuture = factorFutures.begin();
+
+            if (factorFuture->wait_for(chrono::milliseconds(1000)) == future_status::ready) {
+                vector<InfInt> factors = factorFuture->get();
+
+                cout << newInput[index++] << ": ";
+                for (const InfInt& factor : factors) {
+                    cout << factor << " ";
+                }
+                cout << endl;
+                factorFutures.erase(factorFuture);
             }
         }
     } catch (const CLI::ParseError &error){
