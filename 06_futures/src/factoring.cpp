@@ -43,11 +43,10 @@ int main(int argc, char* const argv[]) {
 
         for(int i = 0; i < newInput.size(); i++){
             vector<InfInt> factors = get_factors(newInput[i]);
-            cout << newInput[i] << ": " << flush;
+            cout << newInput[i] << ": " << endl;
             for(int j = 0; j < factors.size(); j++){
-                cout << factors[j] << " " << flush;
+                cout << factors[j] << " " << endl;
             }
-            cout << "\n" << flush;
         }
     } catch (const CLI::ParseError &error){
         return app.exit(error);
