@@ -11,6 +11,7 @@
 #include "CLI11.hpp"
 #include "calc_factors.h"
 #include <future>
+#include <thread>
 
 
 using namespace std;
@@ -22,6 +23,14 @@ string checkValidator(const string& s){
     }else{
         return ""; 
     }
+}
+
+void printFactors(const vector<InfInt>& factors, const vector<InfInt>& numbers) {
+    cout << numbers[0] << ": ";
+    for (const InfInt& factor : factors) {
+        cout << factor << " ";
+    }
+    cout << endl;
 }
 
 int main(int argc, char* const argv[]) {
@@ -47,19 +56,16 @@ int main(int argc, char* const argv[]) {
             factorFutures.push_back(async(launch::async, get_factors, number));
         }
 
-        int index = 0;
         while (!factorFutures.empty()) {
             auto factorFuture = factorFutures.begin();
 
             if (factorFuture->wait_for(chrono::milliseconds(1000)) == future_status::ready) {
                 vector<InfInt> factors = factorFuture->get();
 
-                cout << newInput[index++] << ": ";
-                for (const InfInt& factor : factors) {
-                    cout << factor << " ";
-                }
-                cout << endl;
+                thread t{printFactors, ref(factors), ref(newInput)};
+                t.join();
                 factorFutures.erase(factorFuture);
+                newInput.erase(newInput.begin());
             }
         }
     } catch (const CLI::ParseError &error){
