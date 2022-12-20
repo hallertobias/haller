@@ -57,7 +57,7 @@ void checkFactors(vector<shared_future<vector<InfInt>>>& factorFutures, vector<I
 
 int main(int argc, char* const argv[]) {
     vector<string> input;
-    vector<shared_future<vector<InfInt>> > factorFutures{};
+    vector<shared_future<vector<InfInt>>> factorFutures;
 
     CLI::App app("Factor numbers");
     app.add_option("number", input, "numbers to factor")->required()->check(checkValidator);
@@ -77,7 +77,12 @@ int main(int argc, char* const argv[]) {
         }
 
         for (const InfInt& number : newInput) {
-            factorFutures.push_back(async(launch::async, get_factors, number));
+            if (asy) {
+                factorFutures.push_back(async(launch::async, get_factors, number));
+            } else {
+                factorFutures.push_back(async(launch::deferred, get_factors, number));
+                factorFutures.back().wait();
+            }
         }
 
         thread printThread{printFactors, ref(factorFutures), ref(newInput)};
