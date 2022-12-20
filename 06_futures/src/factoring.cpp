@@ -25,12 +25,12 @@ string checkValidator(const string& s){
     }
 }
 
-void printFactors(vector<future<vector<InfInt>>>& factorFutures, vector<InfInt>& numbers) {
-        for(int i=0; i < factorFutures.size(); i++) {
-        future<vector<InfInt>>& factorFuture = factorFutures.at(i);
+void printFactors(vector<shared_future<vector<InfInt>>>& factorFutures, vector<InfInt>& numbers) {
+    for(int i=0; i < factorFutures.size(); i++) {
+        shared_future<vector<InfInt>>& factorFuture = factorFutures.at(i);
         if (factorFuture.wait_for(chrono::milliseconds(1000)) == future_status::ready) {
             vector<InfInt> factors = factorFuture.get();
-            cout << numbers[0] << ": ";
+            cout << numbers[i] << ": ";
             for (const InfInt& factor : factors) {
                 cout << factor << " ";
             }
@@ -39,9 +39,25 @@ void printFactors(vector<future<vector<InfInt>>>& factorFutures, vector<InfInt>&
     }
 }
 
+void checkFactors(vector<shared_future<vector<InfInt>>>& factorFutures, vector<InfInt>& numbers) {
+    for(int i=0; i < factorFutures.size(); i++) {
+        shared_future<vector<InfInt>>& factorFuture = factorFutures.at(i);
+        if (factorFuture.wait_for(chrono::milliseconds(1000)) == future_status::ready) {
+            vector<InfInt> factors = factorFuture.get();
+            InfInt checksum = 1;
+            for(const InfInt& factor : factors) {
+                checksum *= factor;
+            }
+            if(checksum != numbers[i]) {
+                cerr << "ERROR: " << numbers[i] << " not the right product" << endl;
+            }
+        }
+    }
+}
+
 int main(int argc, char* const argv[]) {
     vector<string> input;
-    vector<future<vector<InfInt>> > factorFutures{};
+    vector<shared_future<vector<InfInt>> > factorFutures{};
 
     CLI::App app("Factor numbers");
     app.add_option("number", input, "numbers to factor")->required()->check(checkValidator);
@@ -62,9 +78,10 @@ int main(int argc, char* const argv[]) {
             factorFutures.push_back(async(launch::async, get_factors, number));
         }
 
-        thread t{printFactors, ref(factorFutures), ref(newInput)};
-        t.join();
-        
+        thread printThread{printFactors, ref(factorFutures), ref(newInput)};
+        printThread.join();
+        thread checkThread{checkFactors, ref(factorFutures), ref(newInput)};
+        checkThread.join();
     } catch (const CLI::ParseError &error){
         return app.exit(error);
     }
