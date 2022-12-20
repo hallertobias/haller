@@ -69,6 +69,8 @@ int main(int argc, char* const argv[]) {
         app.parse(argc, argv);
         vector<InfInt> newInput;
 
+        auto start = chrono::system_clock::now();
+
         for(int i = 0; i < input.size(); i++){
             InfInt input_item = input[i];
             newInput.push_back(input_item);
@@ -79,9 +81,20 @@ int main(int argc, char* const argv[]) {
         }
 
         thread printThread{printFactors, ref(factorFutures), ref(newInput)};
-        printThread.join();
         thread checkThread{checkFactors, ref(factorFutures), ref(newInput)};
+
+        for(int i=0; i < factorFutures.size(); i++) {
+            if (factorFutures[i].wait_for(chrono::milliseconds(1000)) == future_status::ready) {
+                i++;
+            }
+        }
+        auto duration = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now() - start);
+
+        printThread.join();
         checkThread.join();
+
+        cout << "Time elapsed used for facotring: " << duration.count() << "ms" << endl;
+
     } catch (const CLI::ParseError &error){
         return app.exit(error);
     }
