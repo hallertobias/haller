@@ -25,12 +25,18 @@ string checkValidator(const string& s){
     }
 }
 
-void printFactors(const vector<InfInt>& factors, const vector<InfInt>& numbers) {
-    cout << numbers[0] << ": ";
-    for (const InfInt& factor : factors) {
-        cout << factor << " ";
+void printFactors(vector<future<vector<InfInt>>>& factorFutures, vector<InfInt>& numbers) {
+        for(int i=0; i < factorFutures.size(); i++) {
+        future<vector<InfInt>>& factorFuture = factorFutures.at(i);
+        if (factorFuture.wait_for(chrono::milliseconds(1000)) == future_status::ready) {
+            vector<InfInt> factors = factorFuture.get();
+            cout << numbers[0] << ": ";
+            for (const InfInt& factor : factors) {
+                cout << factor << " ";
+            }
+            cout << endl;
+        }
     }
-    cout << endl;
 }
 
 int main(int argc, char* const argv[]) {
@@ -56,18 +62,9 @@ int main(int argc, char* const argv[]) {
             factorFutures.push_back(async(launch::async, get_factors, number));
         }
 
-        while (!factorFutures.empty()) {
-            auto factorFuture = factorFutures.begin();
-
-            if (factorFuture->wait_for(chrono::milliseconds(1000)) == future_status::ready) {
-                vector<InfInt> factors = factorFuture->get();
-
-                thread t{printFactors, ref(factors), ref(newInput)};
-                t.join();
-                factorFutures.erase(factorFuture);
-                newInput.erase(newInput.begin());
-            }
-        }
+        thread t{printFactors, ref(factorFutures), ref(newInput)};
+        t.join();
+        
     } catch (const CLI::ParseError &error){
         return app.exit(error);
     }
