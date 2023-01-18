@@ -1,5 +1,6 @@
 #include "clock.cpp"
 #include <string>
+#include "pipe.h"
 
 class TimeSlave {
     private:
@@ -13,6 +14,19 @@ class TimeSlave {
             clock();
         }
 };
+
+class Channel {
+    private: 
+        Pipe<long> p1;
+        Pipe<long> p2;
+    public:
+        Pipe<long>& getPipe1() {
+            return p1;
+        }
+        Pipe<long>& getPipe2() {
+            return p2;
+        }
+}
 
 class TimeMaster {
     private: 
