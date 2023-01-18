@@ -13,6 +13,8 @@ class TimeSlave {
 };
 
 int main() {
-    thread t(TimeSlave{"Sklave", 12, 12, 12});
+    thread t(TimeSlave{"Sklave 1", 12, 12, 12});
     t.join();
+    thread t2(TimeSlave{"Sklave 2", 12, 12, 12});
+    t2.join();
 } 
