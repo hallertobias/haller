@@ -9,7 +9,22 @@ class TimeSlave {
         TimeSlave(string name, int hours, int minutes, int seconds) : clock(name + " Clock", hours, minutes, seconds) {
             this->name = name;
         };
-        void operator()() {}
+        void operator()() {
+            clock();
+        }
+};
+
+class TimeMaster {
+    private: 
+        string name;
+        Clock clock;
+    public:
+        TimeMaster(string name, int hours, int minutes, int seconds) : clock(name + " Clock", hours, minutes, seconds) {
+            this->name = name;
+        }
+        void operator()() {
+            clock();
+        };
 };
 
 int main() {
