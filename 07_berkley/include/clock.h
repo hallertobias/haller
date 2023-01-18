@@ -2,15 +2,18 @@
 
 #include <string>
 #include <chrono>
+#include <tuple>
 
 using namespace std;
 
 class Clock {
     private:
         string name;
-        chrono::time_point<chrono::system_clock> curr_time = chrono::system_clock::now();
+        chrono::time_point<chrono::system_clock> curr_time;
     public:
         Clock(string name);
-        Clock(string name_, int hours_, int minutes_, int seconds_);
+        Clock(string name, int hours, int minutes, int seconds);
         void operator()();
+        void set_time(int, int, int);
+        tuple<int, int, int> get_time();
 };
