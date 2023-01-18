@@ -13,7 +13,6 @@ Clock::Clock(string name) {
 
 Clock::Clock(string name_, int hours_, int minutes_, int seconds_) {
     this->name = name_;
-    this->curr_time = std::chrono::system_clock::now();
     this->curr_time = set_time(this->curr_time, hours_, minutes_, seconds_);
 }
 
