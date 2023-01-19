@@ -4,6 +4,7 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
+#include <future>
 
 template <typename T>
 class Pipe {
@@ -15,11 +16,15 @@ class Pipe {
 
     public:
         Pipe& operator<<(T value) {
-            if(!closed) {
-                std::unique_lock<std::mutex> lock{mtx};
+            future<void> future{async([&] {
+                if (this->latency) {
+                    this_thread::sleep_for(chrono::milliseconds(this->latency));
+                }
+                lock_guard<mutex> lock(mtx);
                 backend.push(value);
                 not_empty.notify_one();
-            }
+            })};
+            future.wait();
             return *this;
         }
 
