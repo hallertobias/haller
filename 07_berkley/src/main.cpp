@@ -25,12 +25,7 @@ class TimeSlave {
             this->name = name;
         };
         void operator()() {
-            long value;
-            Pipe<long>& pipe = this->channel->getPipe1();
-            while (pipe >> value) {
-                std::cout << name << ": " << value << std::endl;
-            }
-            std::cout << name << ": end" << std::endl;
+            clock();
         };
         Channel* getChannel() {
             return channel;
@@ -48,14 +43,7 @@ class TimeMaster {
             this->name = name;
         }
         void operator()() {
-            for (int i = 0; i < 3; i++) {
-            this->channel1->getPipe1() << i;
-            this->channel2->getPipe2() << i;
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            this->channel1->getPipe1().close();
-            this->channel2->getPipe2().close();
-            std::cout << "master: end" << std::endl;
+            clock();
         };
         void setChannel1(Channel* channel) {
             this->channel1 = channel;

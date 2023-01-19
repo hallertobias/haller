@@ -38,3 +38,14 @@ tuple<int, int, int> Clock::get_time()
 {
     return timeutils::get_time(this->curr_time);
 }
+
+long Clock::to_time()
+{
+    return chrono::system_clock::to_time_t(this->curr_time);
+}
+
+void Clock::from_time(long time)
+{
+    cout << this->name + " time update: " + to_string(time) << endl;
+    this->curr_time = chrono::system_clock::from_time_t(time);
+}
