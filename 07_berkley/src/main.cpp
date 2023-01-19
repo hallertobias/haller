@@ -13,6 +13,10 @@ class Channel {
         Pipe<long>& getPipe2() {
             return p2;
         };
+        void set_latency(long latency) {
+            this->p1.set_latency(latency);
+            this->p2.set_latency(latency);
+        }
 };
 
 class TimeSlave {
@@ -74,8 +78,8 @@ class TimeMaster {
 
             time = this->clock.to_time();
 
-            this->channel1->getPipe2() << slave1Time;
-            this->channel2->getPipe2() << slave2Time;
+            this->channel1->getPipe2() >> slave1Time;
+            this->channel2->getPipe2() >> slave2Time;
 
             long syncTime = (time + slave1Time + slave2Time) / 3;
 
