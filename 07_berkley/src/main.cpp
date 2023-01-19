@@ -1,6 +1,7 @@
 #include "clock.cpp"
 #include <string>
 #include "pipe.h"
+#include "CLI11.hpp"
 
 class Channel {
     private: 
@@ -34,13 +35,19 @@ class TimeSlave {
                 if (syncTime > 0) {
                     this->clock.from_time(syncTime);
                 } else {
-                    cout << this->name + "Slave request time: " + to_string(this->clock.to_time()) << endl;
+                    cout << this->name + " request time: " + to_string(this->clock.to_time()) << endl;
                     this->channel->getPipe2() << this->clock.to_time(); 
                 }
             }
         };
         Channel* getChannel() {
             return channel;
+        };
+        void set_time_monoton(bool monoton) {
+            this->clock.set_time_monoton(monoton);
+        };
+        void setClockSpeed(int clockSpeed) {
+            this->clock.setClockSpeed(clockSpeed);
         };
 };
 
@@ -74,7 +81,7 @@ class TimeMaster {
             cout << "Starting berkley algo with: " + to_string(this->clock.to_time()) << endl;
 
             this->channel1->getPipe1() << -1;
-            this->channel2->getPipe2() << -1;
+            this->channel2->getPipe1() << -1;
 
             time = this->clock.to_time();
 
@@ -85,21 +92,56 @@ class TimeMaster {
 
             this->clock.from_time(syncTime);
             this->channel1->getPipe1() << syncTime;
-            this->channel2->getPipe2() << syncTime;
-
+            this->channel2->getPipe1() << syncTime;
         }
+        void set_time_monoton(bool monoton) {
+            this->clock.set_time_monoton(monoton);
+        };
+        void setClockSpeed(int clockSpeed) {
+            this->clock.setClockSpeed(clockSpeed);
+        };
 };
 
-int main() {
-    TimeMaster master{"Test Meister", 12, 12, 12};
-    thread masterThread{ref(master)};
-    TimeSlave slave1{"Test Sklave 1", 11, 12, 12};
-    thread slave1Thread{ref(slave1)};
-    TimeSlave slave2{"Test Sklave 2", 10, 12, 12};
-    thread slave2Thread{ref(slave2)};
+int main(int argc, char* argv[]) {
+    bool monoton = false;
+    int latency1 = 0;
+    int latency2 = 0;
+    int deviSlave1 = 1000;
+    int deviSlave2 = 1000;
+    int deviMaster = 1000;
+
+    CLI::App app("Berkley Algo"); 
+
+    app.add_flag("--monotone", monoton, "set monotone mode");
+    app.add_option("--latency1", latency1, "latency to channel 1 (both directions)");
+    app.add_option("--latency2", latency2, "latency to channel 2 (both directions)");
+    app.add_option("--deviation1", deviSlave1, "deviation of clock of slave 1");
+    app.add_option("--deviation2", deviSlave2, "deviation of clock of slave 2");
+    app.add_option("--deviationm", deviMaster, "deviation of clock of master");
+
+    CLI11_PARSE(app, argc, argv); 
+
+    TimeMaster master{"Test Meister", 0, 0, 11};
+    TimeSlave slave1{"Test Sklave 1", 0, 0, 33};
+    TimeSlave slave2{"Test Sklave 2", 0, 0, 40};
+
+    master.set_time_monoton(monoton);
+    slave1.set_time_monoton(monoton);
+    slave2.set_time_monoton(monoton);
+
+    slave1.getChannel()->set_latency(latency1);
+    slave2.getChannel()->set_latency(latency2);
+
+    slave1.setClockSpeed(deviSlave1);
+    slave2.setClockSpeed(deviSlave2);
+    master.setClockSpeed(deviMaster);
 
     master.setChannel1(slave1.getChannel());
     master.setChannel2(slave2.getChannel());
+
+    thread masterThread{ref(master)};
+    thread slave1Thread{ref(slave1)};
+    thread slave2Thread{ref(slave2)};
 
     slave1Thread.join();
     slave2Thread.join();

@@ -12,7 +12,7 @@ class Clock {
         chrono::time_point<chrono::system_clock> curr_time;
         bool monoton;
         int clockSlowndon = 0;
-        int clockSpeed = 0;
+        int clockSpeed = 1000;
     public:
         Clock(string name);
         Clock(string name, int hours, int minutes, int seconds);

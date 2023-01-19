@@ -23,7 +23,7 @@ void Clock::operator()()
 {
     while (true)
     {
-        this_thread::sleep_for(chrono::seconds(1));
+        this_thread::sleep_for(1s + chrono::milliseconds(this->clockSpeed + this->clockSlowndon));
         this->curr_time += 1s;
         cout << name << ": " << this->curr_time << endl;
     }
