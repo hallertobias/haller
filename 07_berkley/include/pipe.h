@@ -11,6 +11,7 @@ class Pipe {
     std::mutex mtx;
     std::condition_variable not_empty;
     bool closed{false};
+    long latency{0};
 
     public:
         Pipe& operator<<(T value) {
@@ -27,7 +28,8 @@ class Pipe {
                 std::unique_lock<std::mutex> lock{mtx};
                 not_empty.wait(lock, [this]{return backend.size();});
                 backend.front();
-                value = backend.pop();
+                value = backend.front();
+                backend.pop();
             }
             return *this;
         }
@@ -38,5 +40,9 @@ class Pipe {
 
         explicit operator bool() {
             return !closed;
+        }
+
+        void set_latency(long latency) {
+            this->latency = latency;
         }
 };
