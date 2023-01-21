@@ -33,7 +33,20 @@ class TimeSlave {
             long syncTime;
             while(this->channel->getPipe1() >> syncTime) {
                 if (syncTime > 0) {
-                    this->clock.from_time(syncTime);
+                    long slaveTime = clock.to_time();
+                    if (clock.getMonoton() && syncTime < slaveTime) {
+                        cout << this->name << " slowing down clock" << endl;
+                        this->clock.set_time_monoton(true);
+                    } else {
+                        this->clock.set_time_monoton(false);
+                        this->clock.from_time(syncTime);
+
+                        if (this->clock.getMonoton()) {
+                            cout << this->name << " time corrected" << endl;
+                        } else {
+                            cout << this->name << " setting time to " << syncTime << endl;
+                        }
+                    }
                 } else {
                     cout << this->name + " request time: " + to_string(this->clock.to_time()) << endl;
                     this->channel->getPipe2() << this->clock.to_time(); 

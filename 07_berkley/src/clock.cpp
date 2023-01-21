@@ -62,3 +62,7 @@ void Clock::set_time_monoton(bool monton) {
 void Clock::setClockSpeed(int clockSpeed) {
     this->clockSpeed = clockSpeed;
 }
+
+bool Clock::getMonoton() {
+    return this->monoton;
+}

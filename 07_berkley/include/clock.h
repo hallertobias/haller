@@ -23,5 +23,6 @@ class Clock {
         void from_time(long time);
         void setClockSpeed(int);
         void set_time_monoton(bool);
+        bool getMonoton();
 
 };
