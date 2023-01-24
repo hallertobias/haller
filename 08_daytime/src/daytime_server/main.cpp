@@ -2,8 +2,8 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "asio.hpp"
 #include <chrono>
-#include "timeutils.h"
 #include "CLI11.hpp"
+#include "timeutils.h"
 
 using namespace std;
 using namespace asio::ip;
@@ -26,7 +26,11 @@ int main(int argc, char* argv[]) {
         acceptor.accept(sock);
         tcp::iostream strm{move(sock)};
         if(strm) {
-            strm << chrono::system_clock::now() << endl;
+            try {
+                strm << chrono::system_clock::now() << endl;
+            } catch(...) {
+                spdlog::error("Could not send correctly");
+            }
         } else {
             spdlog::error("Could not connect to client");
         }
