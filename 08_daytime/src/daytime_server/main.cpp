@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
     spdlog::info("Server started");
 
     CLI::App app{"daytime_server"};
-    unsigned int port = 1113;
+    unsigned short port = 1113;
     app.add_option("-p, --port", port, "server port");
 
     CLI11_PARSE(app, argc, argv);
