@@ -19,7 +19,11 @@ int main(int argc, char* argv[]) {
     if (stream) {
         string line;
         getline(stream, line);
-        cout << line << endl;
+        if (line.length() != 0) {
+            cout << line << endl;
+        } else {
+            spdlog::error("Could not get data from server");
+        }
     } else {
         spdlog::error("Could not connect to server");
     }
