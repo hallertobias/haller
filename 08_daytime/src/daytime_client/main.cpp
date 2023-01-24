@@ -1,4 +1,5 @@
-#include "spdlog.h"
+#include "spdlog/spdlog.h"
 
 int main() {
+    spdlog::info("sjdjf");
 }
