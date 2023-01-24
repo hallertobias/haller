@@ -13,6 +13,6 @@ int main() {
         getline(stream, line);
         cout << line << endl;
     } else {
-        spdlog::error("No connection to the server");
+        spdlog::error("Could not connect to server");
     }
 }
