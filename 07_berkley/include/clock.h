@@ -24,5 +24,5 @@ class Clock {
         void setClockSpeed(int);
         void set_time_monoton(bool);
         bool getMonoton();
-
+        chrono::time_point<chrono::system_clock> getTimeAsTimePoint();
 };

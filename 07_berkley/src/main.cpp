@@ -2,6 +2,8 @@
 #include <string>
 #include "pipe.h"
 #include "CLI11.hpp"
+#include "timeutils.h"
+#include "thread"
 
 class Channel {
     private: 
@@ -28,12 +30,14 @@ class TimeSlave {
     public:
         TimeSlave(string name, int hours, int minutes, int seconds) : clock(name + " Clock", hours, minutes, seconds) {
             this->name = name;
+            thread clockThread(ref(this->clock));
+            clockThread.detach();
         };
         void operator()() {
             long syncTime;
             while(this->channel->getPipe1() >> syncTime) {
                 if (syncTime > 0) {
-                    long slaveTime = clock.to_time();
+                    /* long slaveTime = clock.to_time();
                     if (clock.getMonoton() && syncTime < slaveTime) {
                         cout << this->name << " slowing down clock" << endl;
                         this->clock.set_time_monoton(true);
@@ -44,11 +48,12 @@ class TimeSlave {
                         if (this->clock.getMonoton()) {
                             cout << this->name << " time corrected" << endl;
                         } else {
-                            cout << this->name << " setting time to " << syncTime << endl;
+                            cout << this->name << " setting time to " << this->clock.getTimeAsTimePoint() << endl;
                         }
-                    }
+                    } */
+                    this->clock.from_time(syncTime);
                 } else {
-                    cout << this->name + " request time: " + to_string(this->clock.to_time()) << endl;
+                    cout << this->name << " request time: " << this->clock.getTimeAsTimePoint() << endl;
                     this->channel->getPipe2() << this->clock.to_time(); 
                 }
             }
@@ -73,6 +78,8 @@ class TimeMaster {
     public:
         TimeMaster(string name, int hours, int minutes, int seconds) : clock(name + " Clock", hours, minutes, seconds) {
             this->name = name;
+            thread clockThread(ref(this->clock));
+            clockThread.detach();
         }
         void operator()() {
             while(true) {
@@ -91,7 +98,7 @@ class TimeMaster {
             long slave2Time;
             long time; 
 
-            cout << "Starting berkley algo with: " + to_string(this->clock.to_time()) << endl;
+            cout << "Starting berkley algo with: " << this->clock.getTimeAsTimePoint() << endl;
 
             this->channel1->getPipe1() << -1;
             this->channel2->getPipe1() << -1;
@@ -124,14 +131,12 @@ int main(int argc, char* argv[]) {
     int deviMaster = 1000;
 
     CLI::App app("Berkley Algo"); 
-
     app.add_flag("--monotone", monoton, "set monotone mode");
     app.add_option("--latency1", latency1, "latency to channel 1 (both directions)");
     app.add_option("--latency2", latency2, "latency to channel 2 (both directions)");
     app.add_option("--deviation1", deviSlave1, "deviation of clock of slave 1");
     app.add_option("--deviation2", deviSlave2, "deviation of clock of slave 2");
     app.add_option("--deviationm", deviMaster, "deviation of clock of master");
-
     CLI11_PARSE(app, argc, argv); 
 
     TimeMaster master{"Test Meister", 0, 0, 11};
@@ -152,11 +157,15 @@ int main(int argc, char* argv[]) {
     master.setChannel1(slave1.getChannel());
     master.setChannel2(slave2.getChannel());
 
+    thread clockThread{ref(clock)};
     thread masterThread{ref(master)};
     thread slave1Thread{ref(slave1)};
     thread slave2Thread{ref(slave2)};
 
+    clockThread.join();
     slave1Thread.join();
     slave2Thread.join();
     masterThread.join(); 
+
+
 } 

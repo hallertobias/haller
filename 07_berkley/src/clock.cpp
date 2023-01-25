@@ -31,17 +31,16 @@ void Clock::operator()()
 
 void Clock::set_time(int hours, int minutes, int seconds)
 {
-    chrono::time_point<chrono::system_clock> time = timeutils::set_time(this->curr_time, hours, minutes, seconds);
-    if (time < this->curr_time) {
-        this->clockSlowndon = 100;
-    } else {
-        this->curr_time = timeutils::set_time(this->curr_time, hours, minutes, seconds);
-    }
+    this->curr_time = timeutils::set_time(ref(this->curr_time), hours, minutes, seconds);
 }
 
 tuple<int, int, int> Clock::get_time()
 {
     return timeutils::get_time(this->curr_time);
+}
+
+chrono::time_point<chrono::system_clock> Clock::getTimeAsTimePoint() {
+    return this->curr_time;
 }
 
 long Clock::to_time()
@@ -51,8 +50,13 @@ long Clock::to_time()
 
 void Clock::from_time(long time)
 {
-    cout << this->name + " time update: " + to_string(time) << endl;
     this->curr_time = chrono::system_clock::from_time_t(time);
+    cout << this->name << " time update: " << this->curr_time << endl;
+    if (this->monoton && (to_time() > time)) {
+        clockSlowndon = 100;
+    } else {
+        this->curr_time = chrono::system_clock::from_time_t(time);
+    }
 }
 
 void Clock::set_time_monoton(bool monton) {
